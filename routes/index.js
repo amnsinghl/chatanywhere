@@ -3,6 +3,8 @@ var serverBaseUrl = "server.ngrok.io/";
 
 var express = require('express');
 var router = express.Router();
+var server = require('http').Server(express);
+var io = require('socket.io')(server);
 
 var flock = require('flockos');
 
@@ -30,40 +32,40 @@ function getClientUrl(chatId) {
     return clientBaseUrl + "?chatId=" + chatId;
 }
 
-var socket = null; // TODO update
-
 router.post('/chat', function (req, res, next) {
     var message = req.body;
     var chatId = message.to;
     chatIdToMessages[chatId] = chatIdToMessages[chatId] || [];
     chatIdToMessages[chatId].push(message);
-    if(chatIdToMessages[chatId].lenght > 20) {
+    if (chatIdToMessages[chatId].length > 20) {
         chatIdToMessages[chatId].shift()
     }
-    socket.emit(chatId, message)
+    io.emit(chatId, message)
 });
 router.post('/events', flock.events.listener);
 
-socket.on('fetch', function (param) {
+router.post('/fetchMessages', function (req, res, next) {
     var chatId = param.chatId;
-    replyWith(chatIdToMessages[chatId])
+    res.send(chatIdToMessages[chatId])
 });
 
-socket.on('sendMessage', function (param) {
-    var chatId = param.chatId;
-    var message = param.message;
-    var chatDetails = chatIdDetails[chatId];
-    if (chatDetails != null) {
-        var token = userIdToToken[chatDetails.userId];
-        flock.callMethod('chat.sendMessage', token, {
-            to: chatId,
-            text: message
-        }, function (error, response) {
-            if (!error) {
-                console.log("unable to send message " + response);
-            }
-        });
-    }
-});
+io.on('connection', function (socket) {
+    socket.on('sendMessage', function (param) {
+        var chatId = param.chatId;
+        var message = param.message;
+        var chatDetails = chatIdDetails[chatId];
+        if (chatDetails != null) {
+            var token = userIdToToken[chatDetails.userId];
+            flock.callMethod('chat.sendMessage', token, {
+                to: chatId,
+                text: message
+            }, function (error, response) {
+                if (!error) {
+                    console.log("unable to send message " + response);
+                }
+            });
+        }
+    });
+};
 
 module.exports = router;
