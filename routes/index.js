@@ -22,7 +22,7 @@ flock.events.on('chat.pressButton', function (event, callback) {
     if (chatDetails != null) {
         chatIdDetails[event.chat] = event;
     }
-    var webhookUrl = serverBaseUrl + "chat/";
+    var webhookUrl = serverBaseUrl + "chat";
     callback(null, {text: 'share this url:' + getClientUrl(event.chat) + ' webhookUrl: ' + webhookUrl})
 });
 
@@ -32,19 +32,23 @@ function getClientUrl(chatId) {
 
 var socket = null; // TODO update
 
-router.post('/chat/', function (req, res, next) {
+router.post('/chat', function (req, res, next) {
     var message = req.body;
     var chatId = message.to;
     chatIdToMessages[chatId] = chatIdToMessages[chatId] || [];
     chatIdToMessages[chatId].push(message);
-
+    if(chatIdToMessages[chatId].lenght > 20) {
+        chatIdToMessages[chatId].shift()
+    }
     socket.emit(chatId, message)
 });
 router.post('/events', flock.events.listener);
 
 socket.on('fetch', function (param) {
-
+    var chatId = param.chatId;
+    replyWith(chatIdToMessages[chatId])
 });
+
 socket.on('sendMessage', function (param) {
     var chatId = param.chatId;
     var message = param.message;
