@@ -15,17 +15,22 @@ var userIdToToken = {};
 var chatIdDetails = {};
 var chatIdToMessages = {};
 
-flock.events.on('install', function (event, callback) {
-    userIdToToken[event.userId] = event.token
+flock.events.on('app.install', function (event, callback) {
+    console.log("app install received");
+    userIdToToken[event.userId] = event.token;
+    callback(null)
 });
 
-flock.events.on('chat.pressButton', function (event, callback) {
+flock.events.on('client.pressButton', function (event, callback) {
     var chatDetails = chatIdDetails[event.chat];
-    if (chatDetails != null) {
+    if (!chatDetails) {
         chatIdDetails[event.chat] = event;
+        chatDetails = event;
     }
     var webhookUrl = serverBaseUrl + "chat";
-    callback(null, {text: 'share this url:' + getClientUrl(event.chat) + ' webhookUrl: ' + webhookUrl})
+    var message = 'share this url:' + getClientUrl(event.chat) + ' webhookUrl: ' + webhookUrl;
+    sendMessageToFlock(chatDetails, message, "Chat Anywhere Bot");
+    callback(null, {text: message})
 });
 
 function getClientUrl(chatId) {
@@ -46,26 +51,35 @@ router.post('/events', flock.events.listener);
 
 router.post('/fetchMessages', function (req, res, next) {
     var chatId = param.chatId;
-    res.send(chatIdToMessages[chatId])
+    res.send(chatIdToMessages[chatId] || [])
 });
 
 io.on('connection', function (socket) {
     socket.on('sendMessage', function (param) {
         var chatId = param.chatId;
         var message = param.message;
+        var name = param.name;
         var chatDetails = chatIdDetails[chatId];
-        if (chatDetails != null) {
-            var token = userIdToToken[chatDetails.userId];
-            flock.callMethod('chat.sendMessage', token, {
-                to: chatId,
-                text: message
-            }, function (error, response) {
-                if (!error) {
-                    console.log("unable to send message " + response);
-                }
-            });
+        if (!chatDetails) {
+            sendMessageToFlock(chatDetails, message, name)
         }
     });
-};
+});
+
+function sendMessageToFlock(chatDetails, message, senderName) {
+    var token = userIdToToken[chatDetails.userId];
+    flock.callMethod('chat.sendMessage', token, {
+        to: chatDetails.chat,
+        text: message,
+        sendAs : {
+            name: senderName,
+            profileImage: "http://www.iconsdb.com/icons/preview/caribbean-blue/chat-4-xxl.png"
+        }
+    }, function (error, response) {
+        if (!error) {
+            console.log("unable to send message " + response);
+        }
+    });
+}
 
 module.exports = router;
