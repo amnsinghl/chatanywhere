@@ -1,15 +1,15 @@
 var clientBaseUrl = "some.ngrok.io/";
-var serverBaseUrl = "server.ngrok.io/";
+var serverBaseUrl = "https://73017e53.ngrok.io/";
 
 var express = require('express');
 var router = express.Router();
 var server = require('http').Server(express);
-var io = require('socket.io')(server);
+var io = require('socket.io')(server, {path:'/socket'});
 
 var flock = require('flockos');
 
-flock.appId = '493ddb14-0344-4deb-8829-b6d5d231cf76';
-flock.appSecret = '972a7c6f-76b3-432e-93ea-56692ebe308f';
+flock.appId = '81aaeee2-721b-4bd9-badc-337202e1ab6e';
+flock.appSecret = '6be160e3-09a2-4fa2-994a-537dede8b411';
 
 var userIdToToken = {};
 var chatIdDetails = {};
@@ -50,7 +50,7 @@ router.post('/chat', function (req, res, next) {
 router.post('/events', flock.events.listener);
 
 router.post('/fetchMessages', function (req, res, next) {
-    var chatId = param.chatId;
+    var chatId = req.body.chatId;
     res.send(chatIdToMessages[chatId] || [])
 });
 
