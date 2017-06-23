@@ -1,5 +1,6 @@
-var socket = io()
-
+var socket = io();
+var chatId = getParameterByName("chatId");
+console.log("chat id is " + chatId);
 angular.module('ionicApp', ['ionic'])
 
 // All this does is allow the message
@@ -91,3 +92,6 @@ angular.module('ionicApp', ['ionic'])
         $scope.messages = [];
 
     });
+
+
+

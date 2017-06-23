@@ -4,7 +4,7 @@ var serverBaseUrl = "https://73017e53.ngrok.io/";
 var express = require('express');
 var router = express.Router();
 var server = require('http').Server(express);
-var io = require('socket.io')(server, {path:'/socket'});
+var io = require('socket.io')(server);
 
 var flock = require('flockos');
 
