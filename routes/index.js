@@ -1,4 +1,4 @@
-var clientBaseUrl = "some.ngrok.io/";
+var clientBaseUrl = "https://73017e53.ngrok.io/";
 var serverBaseUrl = "https://73017e53.ngrok.io/";
 
 var express = require('express');
@@ -53,6 +53,8 @@ router.post('/fetchMessages', function (req, res, next) {
     var chatId = req.body.chatId;
     res.send(chatIdToMessages[chatId] || [])
 });
+
+
 
 io.on('connection', function (socket) {
     socket.on('sendMessage', function (param) {
