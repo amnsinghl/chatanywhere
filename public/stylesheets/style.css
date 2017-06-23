@@ -1,8 +1,12 @@
-$stable:                          #f8f8f8 !default;
+/**
+   Coded by /u/j0be in scss.
+   See scss source here -> https://codepen.io/j0be/pen/MKRVyN
+*/
 
 .scroll {
     padding: 10px 0 50px !important;
 }
+
 .messages {
     display: -webkit-box !important;
     display: -moz-box !important;
@@ -18,7 +22,9 @@ $stable:                          #f8f8f8 !default;
     -ms-flex-align: center !important;
     align-items: center !important;
     margin-bottom: 20px !important;
-.message {
+}
+
+.messages .message {
     -webkit-box-flex: 1 !important;
     -moz-box-flex: 1 !important;
     -webkit-flex: 1 1 auto !important;
@@ -33,48 +39,19 @@ $stable:                          #f8f8f8 !default;
     -moz-transform: translate3d(0, 0, 0) !important;
     transform: translate3d(0, 0, 0) !important;
 }
-}
-.time {
-    -webkit-box-flex: 0 !important;
-    -moz-box-flex: 0 !important;
-    -webkit-flex: 0 1 auto !important;
-    -ms-flex: 0 1 auto !important;
-    flex: 0 1 auto !important;
-    -webkit-align-self: auto !important;
-    -ms-flex-item-align: auto !important;
-    align-self: auto !important;
-    width: 120px !important;
-    text-align: center !important;
-    padding: 0 0 0 0 !important;
-    -webkit-transition: all 250ms ease-in-out !important;
-    transition: all 250ms ease-in-out !important;
-    -webkit-transform: translate3d(10px, 0, 0) !important;
-    -moz-transform: translate3d(10px, 0, 0) !important;
-    transform: translate3d(10px, 0, 0) !important;
-&.slide-right {
-     -webkit-transform: translate3d(130px, 0, 0) !important;
-     -moz-transform: translate3d(130px, 0, 0) !important;
-     transform: translate3d(130px, 0, 0) !important;
- }
-}
-//This will change
-  .messages.other {
-.message {
+
+.messages.other .message {
     -webkit-transform: translate3d(0, 0, 0) !important;
     -moz-transform: translate3d(0, 0, 0) !important;
     transform: translate3d(0, 0, 0) !important;
     text-align: right !important;
 }
-.message.slide-right {
-    -webkit-transform: translate3d(120px, 0, 0) !important;
-    -moz-transform: translate3d(120px, 0, 0) !important;
-    transform: translate3d(120px, 0, 0) !important;
-}
-span {
+
+.messages.other span {
     color: black !important;
     background-color: #C7C7CC !important;
 }
-}
+
 span {
     background: #007AFF !important;
     display: inline-block !important;

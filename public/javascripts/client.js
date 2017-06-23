@@ -53,23 +53,12 @@ angular.module('ionicApp', ['ionic'])
 
         $scope.sendMessage = function() {
             alternate = !alternate;
-
-            var d = new Date();
-            d = d.toLocaleTimeString().replace(/:\d+ /, ' ');
-            socket.emit("sendMessage", {
-                chatId : chatId,
-                message: $scope.data.message,
-                name: "hello"
-            });
             $scope.messages.push({
                 userId: alternate ? '12345' : '54321',
                 text: $scope.data.message,
-                time: d
             });
-
             delete $scope.data.message;
             $ionicScrollDelegate.scrollBottom(true);
-
         };
 
 
