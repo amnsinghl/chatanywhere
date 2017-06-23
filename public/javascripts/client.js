@@ -56,7 +56,11 @@ angular.module('ionicApp', ['ionic'])
 
             var d = new Date();
             d = d.toLocaleTimeString().replace(/:\d+ /, ' ');
-
+            socket.emit("sendMessage", {
+                chatId : chatId,
+                message: $scope.data.message,
+                name: "hello"
+            });
             $scope.messages.push({
                 userId: alternate ? '12345' : '54321',
                 text: $scope.data.message,
