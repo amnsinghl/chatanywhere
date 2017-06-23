@@ -1,4 +1,4 @@
-module.exports = function(io) {
+module.exports = function (io) {
 
     var clientBaseUrl = "https://73017e53.ngrok.io/";
     var serverBaseUrl = "https://73017e53.ngrok.io/";
@@ -36,25 +36,27 @@ module.exports = function(io) {
         return clientBaseUrl + "?chatId=" + chatId;
     }
 
-    router.post('/chat', function (req, res, next) {
+    router.post('/chat*', function (req, res, next) {
+        console.log("received message");
+        console.log(JSON.stringify(req.body));
         var message = req.body;
         var chatId = message.to;
-        chatIdToMessages[chatId] = chatIdToMessages[chatId] || [];
-        chatIdToMessages[chatId].push(message);
-        if (chatIdToMessages[chatId].length > 20) {
-            chatIdToMessages[chatId].shift()
+        if(!message.sendAs) {
+            pushToClient(chatId, message);
         }
-        io.emit(chatId, message)
+        res.send("ok");
     });
     router.post('/events', flock.events.listener);
 
     router.post('/fetchMessages', function (req, res, next) {
+        console.log(JSON.stringify(req.body));
         var chatId = req.body.chatId;
         res.send(chatIdToMessages[chatId] || [])
     });
 
 
     io.on('connection', function (socket) {
+        console.log("client connected");
         socket.on('sendMessage', function (param) {
             console.log("received params" + param);
             var chatId = param.chatId;
@@ -78,9 +80,26 @@ module.exports = function(io) {
             }
         }, function (error, response) {
             if (!error) {
-                console.log("unable to send message " + response);
+                console.log("success in sending message " + response);
             }
         });
     }
+
+    function pushToClient(chatId, message) {
+        var chatDetails = chatIdDetails[chatId];
+        var token = userIdToToken[chatDetails.userId];
+        flock.callMethod('users.getPublicProfile', token, {
+            userId: message.from
+        }, function (error, response) {
+            if (!error) {
+                console.log("received user details" + response);
+                message.name = response.firstName + " " + response.lastName;
+                chatIdToMessages[chatId] = chatIdToMessages[chatId] || [];
+                chatIdToMessages[chatId].push(message);
+                io.emit(chatId, message);
+            }
+        });
+    }
+
     return router;
 };
